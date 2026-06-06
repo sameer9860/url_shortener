@@ -4,6 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 
 
+# Base62 String
 BASE62 = string.ascii_letters + string.digits   
 
 def generate_short_key(length=6):
@@ -16,6 +17,8 @@ def unique_short_key():
         if not ShortURL.objects.filter(short_key=key).exists():
             return key
 
+
+# Generate QR Code
 def generate_qr_code(short_url_obj,request):
     full_url = request.build_absolute_uri(f'/{short_url_obj.short_key}/')
     img = qrcode.make(full_url)
@@ -27,6 +30,7 @@ def generate_qr_code(short_url_obj,request):
     short_url_obj.save()
     
 
+# Check Expiry
 def is_expired(short_url_obj):
     if short_url_obj.expires_at:
         return timezone.now() > short_url_obj.expires_at

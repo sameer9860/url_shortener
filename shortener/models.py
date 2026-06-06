@@ -4,7 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
 
-
+# Short URL Model
 class ShortURL(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,related_name='short_urls')
     original_url = models.URLField(max_length=2000)
@@ -21,7 +21,8 @@ class ShortURL(models.Model):
 
     def __str__(self):
         return self.short_key
-    
+        
+# Click Model
 class Click(models.Model):
     short_url = models.ForeignKey(ShortURL,on_delete=models.CASCADE,related_name="clicks")
     clicked_at = models.DateTimeField(auto_now_add=True)

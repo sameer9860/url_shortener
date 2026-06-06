@@ -15,8 +15,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+from shortener.views import redirect_url
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-]
+    path('accounts/', include('accounts.urls')),
+    path('', include('shortener.urls')),
+    # catches any /<short_key>/ not matched above
+    path('<str:short_key>/', redirect_url, name='redirect_url'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
