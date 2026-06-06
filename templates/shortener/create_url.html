@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Short URL{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+
+        <h4 class="fw-bold mb-4">
+          <i class="bi bi-plus-circle me-2 text-primary"></i>Create Short URL
+        </h4>
+
+        <form method="POST" novalidate>
+          {% csrf_token %}
+
+          <!-- Original URL -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Long URL <span class="text-danger">*</span></label>
+            {{ form.original_url }}
+            {% for error in form.original_url.errors %}
+              <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          <!-- Custom Key -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Custom Short Key <span class="text-muted fw-normal">(optional)</span></label>
+            <div class="input-group">
+              <span class="input-group-text text-muted">/</span>
+              {{ form.custom_key }}
+            </div>
+            {% for error in form.custom_key.errors %}
+              <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+            <div class="form-text">{{ form.custom_key.help_text }}</div>
+          </div>
+
+          <!-- Expiration -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Expiration Date <span class="text-muted fw-normal">(optional)</span></label>
+            {{ form.expires_at }}
+            {% for error in form.expires_at.errors %}
+              <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+            <div class="form-text">{{ form.expires_at.help_text }}</div>
+          </div>
+
+          <!-- QR Code -->
+          <div class="mb-4">
+            <div class="form-check">
+              {{ form.generate_qr }}
+              <label class="form-check-label fw-semibold" for="{{ form.generate_qr.id_for_label }}">
+                <i class="bi bi-qr-code me-1"></i>Generate QR Code
+              </label>
+            </div>
+            <div class="form-text ms-4">{{ form.generate_qr.help_text }}</div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary px-4">
+              <i class="bi bi-scissors me-1"></i>Shorten URL
+            </button>
+            <a href="{% url 'shortener:dashboard' %}" class="btn btn-outline-secondary px-4">
+              Cancel
+            </a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
