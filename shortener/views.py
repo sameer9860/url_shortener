@@ -40,7 +40,7 @@ def create_url(request):
                 generate_qr_code(short_url, request)
 
             messages.success(request, f'Short URL created successfully!')
-            return redirect('dashboard')
+            return redirect('shortener:dashboard')
         else:
             messages.error(request, 'Please fix the errors below.')
     else:
@@ -59,7 +59,7 @@ def edit_url(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, 'URL updated successfully!')
-            return redirect('dashboard')
+            return redirect('shortener:dashboard')
         else:
             messages.error(request, 'Please fix the errors below.')
     else:
@@ -79,7 +79,7 @@ def delete_url(request, pk):
     if request.method == 'POST':
         short_url.delete()
         messages.success(request, 'Short URL deleted successfully!')
-        return redirect('dashboard')
+        return redirect('shortener:dashboard')
 
     return render(request, 'shortener/delete_confirm.html', {'short_url': short_url})
 

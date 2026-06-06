@@ -8,7 +8,7 @@ class CreateURLForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'e.g. my-brand (optional)'
+            'placeholder': ' my-brand '
         }),
         help_text='Leave blank to auto-generate. Only letters, numbers, and hyphens.'
     )
