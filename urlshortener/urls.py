@@ -22,8 +22,8 @@ from shortener.views import redirect_url
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('accounts.urls')),
-    path('', include('shortener.urls')),
+    path('', include('accounts.urls')),
+    path('shortner/', include('shortener.urls')),
     # catches any /<short_key>/ not matched above
     path('<str:short_key>/', redirect_url, name='redirect_url'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
