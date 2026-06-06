@@ -3,58 +3,137 @@
 {% block title %}Create Account{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
-  <div class="col-md-5">
-    <div class="card shadow-sm">
-      <div class="card-body p-4">
 
-        <h3 class="card-title text-center mb-4">
-          <i class="bi bi-person-plus-fill me-2 text-primary"></i>Create Account
-        </h3>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-        {% if messages %}
-          {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-              {{ message }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-          {% endfor %}
-        {% endif %}
+<style>
+  body {
+    background: #f7f7f8;
+  }
 
-        <form method="POST" novalidate>
-          {% csrf_token %}
-          {% for field in form %}
-            <div class="mb-3">
-              <label for="{{ field.id_for_label }}" class="form-label fw-semibold">
-                {{ field.label }}
-              </label>
-              {{ field }}
-              {% if field.errors %}
-                {% for error in field.errors %}
-                  <div class="text-danger small mt-1">{{ error }}</div>
-                {% endfor %}
-              {% endif %}
-              {% if field.help_text %}
-                <div class="form-text text-muted">{{ field.help_text }}</div>
-              {% endif %}
-            </div>
-          {% endfor %}
+  .card {
+    background: #fff;
+  }
 
-          <div class="d-grid mt-4">
-            <button type="submit" class="btn btn-primary btn-lg">
-              <i class="bi bi-check-circle me-2"></i>Register
-            </button>
+  .form-control {
+    border-radius: 12px;
+    padding: 12px;
+  }
+
+  .btn-primary {
+    background: black;
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background: black;
+  }
+
+  .password-toggle {
+    position: absolute;
+    right: 0.75rem;
+    top: 0.75rem;
+    z-index: 5;
+  }
+</style>
+
+<div class="container">
+  <div class="row justify-content-center align-items-center min-vh-100">
+    <div class="col-md-5 col-lg-4 d-flex justify-content-center">
+
+      <div class="card border-0 shadow-lg rounded-4 w-100">
+        <div class="card-body p-4 p-md-5">
+
+          <div class="text-center mb-4">
+            <h2 class="fw-bold">Create Account</h2>
+            <p class="text-muted">Sign up to get started</p>
           </div>
-        </form>
 
-        <hr>
-        <p class="text-center text-muted mb-0">
-          Already have an account?
-          <a href="{% url 'accounts:login' %}" class="text-decoration-none">Log in here</a>
-        </p>
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
 
+          <form method="POST" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+              {% if field.name == 'password1' or field.name == 'password2' %}
+                <div class="form-floating mb-3 position-relative">
+                  <input type="password" name="{{ field.name }}" id="{{ field.id_for_label }}" 
+                         class="form-control" placeholder="{{ field.label }}" required>
+                  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                  <button type="button" class="btn btn-outline-secondary password-toggle togglePassword" data-target="{{ field.id_for_label }}">
+                    <i class="fa-solid fa-eye-slash"></i>
+                  </button>
+                  {% for error in field.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <div class="form-floating mb-3">
+                  <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="{{ field.id_for_label }}" 
+                         class="form-control" placeholder="{{ field.label }}" required>
+                  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                  {% for error in field.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                  {% endfor %}
+                  {% if field.help_text and field.name not in 'username password1 password2' %}
+                    <div class="form-text text-muted">{{ field.help_text }}</div>
+                  {% endif %}
+                </div>
+              {% endif %}
+            {% endfor %}
+
+            <div class="d-grid mt-4">
+              <button type="submit" class="btn btn-primary btn-lg rounded-3">
+                Register
+              </button>
+            </div>
+          </form>
+
+          <div class="text-center mt-4">
+            <span class="text-muted">
+              Already have an account?
+            </span>
+            <a href="{% url 'accounts:login' %}" class="text-decoration-none">
+              Log in here
+            </a>
+          </div>
+
+        </div>
       </div>
+
     </div>
   </div>
 </div>
+
+<!-- Password Toggle -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggles = document.querySelectorAll(".togglePassword");
+
+    toggles.forEach(toggle => {
+      const targetId = toggle.getAttribute("data-target");
+      const input = document.getElementById(targetId);
+      const icon = toggle.querySelector("i");
+
+      toggle.addEventListener("click", function () {
+        if (input.type === "password") {
+          input.type = "text";
+          icon.classList.remove("fa-eye-slash");
+          icon.classList.add("fa-eye");
+        } else {
+          input.type = "password";
+          icon.classList.remove("fa-eye");
+          icon.classList.add("fa-eye-slash");
+        }
+      });
+    });
+  });
+</script>
+
 {% endblock %}
