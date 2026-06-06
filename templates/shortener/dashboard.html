@@ -131,15 +131,15 @@
 
               <!-- Actions -->
               <td class="text-center pe-3">
-                <a href="{% url 'url_detail' url.pk %}"
+                <a href="{% url 'shortener:url_detail' url.pk %}"
                    class="btn btn-outline-info btn-sm" title="Analytics">
                   <i class="bi bi-bar-chart"></i>
                 </a>
-                <a href="{% url 'edit_url' url.pk %}"
+                <a href="{% url 'shortener:edit_url' url.pk %}"
                    class="btn btn-outline-secondary btn-sm" title="Edit">
                   <i class="bi bi-pencil"></i>
                 </a>
-                <a href="{% url 'delete_url' url.pk %}"
+                <a href="{% url 'shortener:delete_url' url.pk %}"
                    class="btn btn-outline-danger btn-sm" title="Delete">
                   <i class="bi bi-trash"></i>
                 </a>
