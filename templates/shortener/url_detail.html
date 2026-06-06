@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics — /{{ short_url.short_key }}{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center mb-4 gap-2">
+  <a href="{% url 'shortener:dashboard' %}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left"></i>
+  </a>
+  <h4 class="fw-bold mb-0">
+    <i class="bi bi-bar-chart me-2 text-info"></i>Analytics — /{{ short_url.short_key }}
+  </h4>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-3">
+    <div class="card shadow-sm text-center">
+      <div class="card-body py-3">
+        <div class="fs-2 fw-bold text-primary">{{ short_url.click_count }}</div>
+        <div class="text-muted small">Total Clicks</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-3">
+    <div class="card shadow-sm text-center">
+      <div class="card-body py-3">
+        <div class="fs-2 fw-bold text-success">{{ clicks_last_7_days }}</div>
+        <div class="text-muted small">Last 7 Days</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-3">
+    <div class="card shadow-sm text-center">
+      <div class="card-body py-3">
+        <div class="fs-2 fw-bold text-warning">{{ clicks_last_30_days }}</div>
+        <div class="text-muted small">Last 30 Days</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-3">
+    <div class="card shadow-sm text-center">
+      <div class="card-body py-3">
+        <div class="fs-2 fw-bold {% if short_url.is_active %}text-success{% else %}text-danger{% endif %}">
+          {% if short_url.is_active %}Active{% else %}Inactive{% endif %}
+        </div>
+        <div class="text-muted small">Status</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- URL Info + QR -->
+<div class="row g-3 mb-4">
+  <div class="col-md-8">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h6 class="fw-bold text-muted text-uppercase small mb-3">URL Details</h6>
+        <table class="table table-sm table-borderless mb-0">
+          <tr>
+            <td class="text-muted" style="width:140px">Short URL</td>
+            <td>
+              <a href="{% url 'redirect_url' short_url.short_key %}" target="_blank"
+                 class="text-decoration-none fw-semibold">
+                {{ request.scheme }}://{{ request.get_host }}/{{ short_url.short_key }}/
+                <i class="bi bi-box-arrow-up-right ms-1 small"></i>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="text-muted">Original URL</td>
+            <td class="text-break">
+              <a href="{{ short_url.original_url }}" target="_blank"
+                 class="text-decoration-none text-dark">
+                {{ short_url.original_url }}
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="text-muted">Created</td>
+            <td>{{ short_url.created_at|date:"M d, Y H:i" }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Expires</td>
+            <td>
+              {% if short_url.expires_at %}
+                {{ short_url.expires_at|date:"M d, Y H:i" }}
+              {% else %}
+                <span class="text-muted">Never</span>
+              {% endif %}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Code -->
+  <div class="col-md-4">
+    <div class="card shadow-sm h-100 text-center">
+      <div class="card-body d-flex flex-column align-items-center justify-content-center">
+        {% if short_url.qr_code %}
+          <img src="{{ short_url.qr_code.url }}" alt="QR Code"
+               class="img-fluid mb-2" style="max-width: 150px;">
+          <a href="{{ short_url.qr_code.url }}" download
+             class="btn btn-outline-dark btn-sm">
+            <i class="bi bi-download me-1"></i>Download QR
+          </a>
+        {% else %}
+          <i class="bi bi-qr-code display-4 text-muted"></i>
+          <p class="text-muted small mt-2 mb-0">No QR code generated</p>
+          <a href="{% url 'edit_url' short_url.pk %}" class="btn btn-outline-secondary btn-sm mt-2">
+            Edit to regenerate
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Clicks Table -->
+<div class="card shadow-sm">
+  <div class="card-body">
+    <h6 class="fw-bold text-muted text-uppercase small mb-3">
+      <i class="bi bi-clock-history me-1"></i>Recent Clicks (last 10)
+    </h6>
+    {% if recent_clicks %}
+      <div class="table-responsive">
+        <table class="table table-sm table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>S.N</th>
+              <th>Date & Time</th>
+              <th>IP Address</th>
+              <th>User Agent</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for click in recent_clicks %}
+            <tr>
+              <td class="text-muted">{{ forloop.counter }}</td>
+              <td>{{ click.clicked_at|date:"M d, Y H:i:s" }}</td>
+              <td>
+                <span class="badge bg-light text-dark border">
+                  {{ click.ip_address|default:"Unknown" }}
+                </span>
+              </td>
+              <td class="text-muted small text-truncate" style="max-width: 250px;"
+                  title="{{ click.user_agent }}">
+                {{ click.user_agent|default:"Unknown"|truncatechars:60 }}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted text-center py-3 mb-0">
+        <i class="bi bi-cursor me-1"></i>No clicks recorded yet.
+      </p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
