@@ -4,13 +4,14 @@ from .models import ShortURL
 # Create URL Form
 class CreateURLForm(forms.ModelForm):
     custom_key = forms.CharField(
-        max_length=20,
+        max_length=10,
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': ' my-brand '
+            'placeholder': ' my-brand ',
+            'maxlength': '10'
         }),
-        help_text='Leave blank to auto-generate. Only letters, numbers, and hyphens.'
+        help_text='Max 10 characters. Leave blank to auto-generate. Only letters, numbers, and hyphens.'
     )
     expires_at = forms.DateTimeField(
         required=False,
@@ -39,18 +40,19 @@ class CreateURLForm(forms.ModelForm):
         }
 
     def clean_custom_key(self):
+        import re
         key = self.cleaned_data.get('custom_key', '').strip()
         if not key:
             return key
+        # Max 10 characters (matches short_key DB column limit)
+        if len(key) > 10:
+            raise forms.ValidationError('Custom key cannot exceed 10 characters.')
         # Only allow letters, numbers, hyphens
-        import re
         if not re.match(r'^[a-zA-Z0-9\-]+$', key):
             raise forms.ValidationError('Only letters, numbers, and hyphens are allowed.')
-        # Check uniqueness against both short_key and custom_key columns
-        if ShortURL.objects.filter(short_key=key).exists():
-            raise forms.ValidationError('This key is already taken. Please choose another.')
-        if ShortURL.objects.filter(custom_key=key).exists():
-            raise forms.ValidationError('This custom key is already taken. Please choose another.')
+        # Check if already taken
+        if ShortURL.objects.filter(short_key=key).exists() or ShortURL.objects.filter(custom_key=key).exists():
+            raise forms.ValidationError(f'"{key}" is already taken. Please choose a different key.')
         return key
 
 
